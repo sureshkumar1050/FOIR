@@ -1,3 +1,4 @@
+
 import streamlit as st
 
 # ============================================================
@@ -5,7 +6,7 @@ import streamlit as st
 # ============================================================
 
 st.set_page_config(
-    page_title="FOIR Calculator",
+    page_title="Loan & Credit Card Eligibility",
     page_icon="💰",
     layout="centered"
 )
@@ -16,7 +17,6 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-
 .main {
     background-color: #f7f9fc;
 }
@@ -31,14 +31,6 @@ st.markdown("""
     text-align: center;
     color: #666;
     margin-bottom: 30px;
-}
-
-.result-box {
-    padding: 20px;
-    border-radius: 12px;
-    background-color: white;
-    border: 1px solid #ddd;
-    margin-bottom: 15px;
 }
 
 .safe {
@@ -61,7 +53,6 @@ st.markdown("""
     background-color: #ffebee;
     border-left: 6px solid #c62828;
 }
-
 </style>
 """, unsafe_allow_html=True)
 
@@ -70,15 +61,29 @@ st.markdown("""
 # ============================================================
 
 st.markdown(
-    '<div class="title">💰 FOIR Calculator</div>',
+    '<div class="title">💰 Financial Eligibility Calculator</div>',
     unsafe_allow_html=True
 )
 
 st.markdown(
     '<div class="subtitle">'
-    'Financial Obligation to Income Ratio – Preliminary Loan Screening'
+    'Loan FOIR Calculation & Credit Card Eligibility Screening'
     '</div>',
     unsafe_allow_html=True
+)
+
+st.divider()
+
+# ============================================================
+# SELECT CALCULATOR
+# ============================================================
+
+calculator_type = st.selectbox(
+    "Select Eligibility Calculator",
+    [
+        "Loan FOIR Calculator",
+        "Credit Card Eligibility"
+    ]
 )
 
 st.divider()
@@ -127,219 +132,432 @@ for i in range(int(num_emis)):
     existing_emi_total += emi
 
 # ============================================================
-# 3. PROPOSED LOAN
+# 3. LOAN FOIR CALCULATOR
 # ============================================================
 
-st.subheader("3️⃣ Proposed Loan")
+if calculator_type == "Loan FOIR Calculator":
 
-proposed_emi = st.number_input(
-    "Proposed New Loan EMI (₹)",
-    min_value=0.0,
-    value=10000.0,
-    step=500.0,
-    format="%.0f"
-)
+    st.subheader("3️⃣ Proposed Loan")
 
-# ============================================================
-# 4. FOIR CALCULATION
-# ============================================================
-
-total_obligation = existing_emi_total + proposed_emi
-
-if monthly_gross_income > 0:
-
-    foir = (
-        total_obligation / monthly_gross_income
-    ) * 100
-
-else:
-
-    foir = 0
-
-remaining_income = monthly_gross_income - total_obligation
-
-# ============================================================
-# FOIR CLASSIFICATION
-# ============================================================
-
-if monthly_gross_income == 0:
-
-    status = "⚪ Unable to Calculate"
-    message = "Please enter a valid monthly gross income."
-    css_class = "result-box"
-
-elif foir < 40:
-
-    status = "🟢 Low / Safe Zone"
-    message = (
-        "Strong repayment capacity based on FOIR. "
-        "The customer's debt obligation is relatively low."
-    )
-    css_class = "safe"
-
-elif foir <= 50:
-
-    status = "🟡 Standard / Acceptable Range"
-    message = (
-        "FOIR is within the commonly used acceptable range. "
-        "Final approval depends on the lender's credit policy and other factors."
-    )
-    css_class = "acceptable"
-
-else:
-
-    status = "🔴 High Risk / Strain Zone"
-    message = (
-        "A large portion of income is committed to debt obligations. "
-        "The application may face stricter eligibility criteria or a lower sanctioned amount."
-    )
-    css_class = "risk"
-
-# ============================================================
-# RESULTS
-# ============================================================
-
-st.subheader("📊 FOIR Result")
-
-col1, col2, col3 = st.columns(3)
-
-with col1:
-
-    st.metric(
-        "FOIR",
-        f"{foir:.2f}%"
+    proposed_emi = st.number_input(
+        "Proposed New Loan EMI (₹)",
+        min_value=0.0,
+        value=10000.0,
+        step=500.0,
+        format="%.0f"
     )
 
-with col2:
+    # FOIR CALCULATION
 
-    st.metric(
-        "Total Obligations",
-        f"₹{total_obligation:,.0f}"
+    total_obligation = existing_emi_total + proposed_emi
+
+    if monthly_gross_income > 0:
+        foir = (total_obligation / monthly_gross_income) * 100
+        existing_foir = (
+            existing_emi_total / monthly_gross_income
+        ) * 100
+    else:
+        foir = 0
+        existing_foir = 0
+
+    remaining_income = monthly_gross_income - total_obligation
+
+    # FOIR CLASSIFICATION
+
+    if monthly_gross_income == 0:
+
+        status = "⚪ Unable to Calculate"
+        message = "Please enter a valid monthly gross income."
+        css_class = "risk"
+
+    elif foir < 40:
+
+        status = "🟢 Low / Safe Zone"
+        message = (
+            "Strong repayment capacity based on FOIR. "
+            "The customer's debt obligation is relatively low."
+        )
+        css_class = "safe"
+
+    elif foir <= 50:
+
+        status = "🟡 Standard / Acceptable Range"
+        message = (
+            "FOIR is within the illustrative acceptable range. "
+            "Final approval depends on the lender's credit policy."
+        )
+        css_class = "acceptable"
+
+    else:
+
+        status = "🔴 High Risk / Strain Zone"
+        message = (
+            "A large portion of income is committed to debt obligations. "
+            "The application may face stricter eligibility criteria."
+        )
+        css_class = "risk"
+
+    # RESULTS
+
+    st.divider()
+    st.subheader("📊 Loan FOIR Result")
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.metric("FOIR", f"{foir:.2f}%")
+
+    with col2:
+        st.metric(
+            "Total Obligations",
+            f"₹{total_obligation:,.0f}"
+        )
+
+    with col3:
+        st.metric(
+            "Remaining Gross Income",
+            f"₹{remaining_income:,.0f}"
+        )
+
+    st.markdown(
+        f"""
+        <div class="{css_class}">
+            <h3>{status}</h3>
+            <p>{message}</p>
+        </div>
+        """,
+        unsafe_allow_html=True
     )
 
-with col3:
+    st.subheader("📋 FOIR Risk Classification")
 
-    st.metric(
-        "Remaining Gross Income",
-        f"₹{remaining_income:,.0f}"
+    st.markdown("""
+    | FOIR | Classification | Interpretation |
+    |---|---|---|
+    | Below 40% | 🟢 Low / Safe | Lower debt burden |
+    | 40%–50% | 🟡 Acceptable | Moderate debt burden |
+    | Above 50% | 🔴 High Risk | Higher debt burden |
+    """)
+
+    # ADDITIONAL EMI CAPACITY
+
+    st.subheader("💡 Additional EMI Capacity")
+
+    if monthly_gross_income > 0:
+
+        maximum_total_emi = monthly_gross_income * 0.50
+
+        maximum_additional_emi = (
+            maximum_total_emi - existing_emi_total
+        )
+
+        if maximum_additional_emi > 0:
+
+            st.success(
+                "Maximum additional EMI to remain within "
+                f"50% FOIR: ₹{maximum_additional_emi:,.0f}"
+            )
+
+        else:
+
+            st.error(
+                "Existing obligations already meet or exceed "
+                "the 50% FOIR threshold."
+            )
+
+        st.info(
+            f"Existing EMI FOIR: **{existing_foir:.2f}%**"
+        )
+
+    else:
+        st.warning("Enter income above zero to calculate EMI capacity.")
+
+    # CALCULATION DETAILS
+
+    with st.expander("🔎 View Calculation Details"):
+
+        st.write(
+            f"**Monthly Gross Income:** ₹{monthly_gross_income:,.2f}"
+        )
+
+        st.write(
+            f"**Existing EMI:** ₹{existing_emi_total:,.2f}"
+        )
+
+        st.write(
+            f"**Proposed EMI:** ₹{proposed_emi:,.2f}"
+        )
+
+        st.write(
+            f"**Total Monthly Obligation:** ₹{total_obligation:,.2f}"
+        )
+
+        if monthly_gross_income > 0:
+            st.write(
+                f"**FOIR Formula:** "
+                f"({total_obligation:,.2f} ÷ "
+                f"{monthly_gross_income:,.2f}) × 100"
+            )
+            st.write(f"**Calculated FOIR:** {foir:.2f}%")
+        else:
+            st.write("FOIR cannot be calculated because income is zero.")
+
+# ============================================================
+# 4. CREDIT CARD ELIGIBILITY
+# ============================================================
+
+elif calculator_type == "Credit Card Eligibility":
+
+    st.subheader("3️⃣ Credit Card Applicant Details")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        age = st.number_input(
+            "Applicant Age",
+            min_value=18,
+            max_value=100,
+            value=30,
+            step=1
+        )
+
+    with col2:
+        credit_score = st.number_input(
+            "Credit Score (300–900)",
+            min_value=300,
+            max_value=900,
+            value=750,
+            step=1
+        )
+
+    employment_type = st.selectbox(
+        "Employment Type",
+        [
+            "Salaried",
+            "Self-Employed"
+        ]
     )
 
-st.markdown(
-    f"""
-    <div class="{css_class}">
-        <h3>{status}</h3>
-        <p>{message}</p>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
-
-# ============================================================
-# FOIR RANGE GUIDE
-# ============================================================
-
-st.subheader("📋 FOIR Risk Classification")
-
-st.markdown("""
-| FOIR | Classification | Interpretation |
-|---|---|---|
-| **Below 40%** | 🟢 Low / Safe | Strong repayment capacity |
-| **40% – 50%** | 🟡 Standard / Acceptable | Generally acceptable range |
-| **Above 50%** | 🔴 High Risk / Strain | Higher debt burden |
-""")
-
-# ============================================================
-# ADDITIONAL EMI CAPACITY
-# ============================================================
-
-st.subheader("💡 Additional EMI Capacity")
-
-# 50% is used as the upper boundary
-maximum_total_emi = monthly_gross_income * 0.50
-
-maximum_additional_emi = (
-    maximum_total_emi - existing_emi_total
-)
-
-if maximum_additional_emi > 0:
-
-    st.success(
-        f"Maximum additional EMI to remain within 50% FOIR: "
-        f"₹{maximum_additional_emi:,.0f}"
+    repayment_history = st.selectbox(
+        "Recent Credit Repayment History",
+        [
+            "No missed payments",
+            "One or more recent missed payments",
+            "Credit card / loan default",
+            "No credit history"
+        ]
     )
 
-else:
+    # --------------------------------------------------------
+    # SCREENING THRESHOLDS
+    # --------------------------------------------------------
 
-    st.error(
-        "The customer's existing obligations already exceed "
-        "the 50% FOIR threshold."
+    st.subheader("4️⃣ Screening Criteria")
+
+    st.caption(
+        "These are editable example thresholds for preliminary "
+        "screening, not universal bank requirements."
     )
 
-# ============================================================
-# EXISTING EMI FOIR
-# ============================================================
+    with st.expander("⚙️ Configure Screening Criteria"):
 
-if monthly_gross_income > 0:
+        minimum_income = st.number_input(
+            "Illustrative Minimum Monthly Income (₹)",
+            min_value=0,
+            value=15000,
+            step=1000
+        )
 
-    existing_foir = (
-        existing_emi_total / monthly_gross_income
-    ) * 100
+        minimum_credit_score = st.number_input(
+            "Illustrative Minimum Credit Score",
+            min_value=300,
+            max_value=900,
+            value=700,
+            step=10
+        )
 
-    st.info(
-        f"Existing EMI FOIR: **{existing_foir:.2f}%**"
-    )
+        maximum_foir = st.slider(
+            "Maximum Existing EMI-to-Income Ratio (%)",
+            min_value=20,
+            max_value=80,
+            value=50,
+            step=5
+        )
 
-# ============================================================
-# CALCULATION DETAILS
-# ============================================================
+        minimum_age = st.number_input(
+            "Illustrative Minimum Age",
+            min_value=18,
+            max_value=100,
+            value=21,
+            step=1
+        )
 
-with st.expander("🔎 View Calculation Details"):
+        maximum_age = st.number_input(
+            "Illustrative Maximum Age",
+            min_value=18,
+            max_value=100,
+            value=60,
+            step=1
+        )
+
+    # --------------------------------------------------------
+    # CREDIT CARD ASSESSMENT
+    # --------------------------------------------------------
+
+    if monthly_gross_income > 0:
+
+        existing_foir = (
+            existing_emi_total / monthly_gross_income
+        ) * 100
+
+        remaining_income = (
+            monthly_gross_income - existing_emi_total
+        )
+
+    else:
+
+        existing_foir = 0
+        remaining_income = 0
+
+    checks = {
+        "Monthly income meets the selected minimum":
+            monthly_gross_income >= minimum_income
+            and monthly_gross_income > 0,
+
+        "Credit score meets the selected threshold":
+            credit_score >= minimum_credit_score,
+
+        "Age is within the selected range":
+            minimum_age <= age <= maximum_age,
+
+        "Existing EMI burden is within the selected limit":
+            monthly_gross_income > 0
+            and existing_foir <= maximum_foir,
+
+        "Repayment history is satisfactory":
+            repayment_history == "No missed payments"
+    }
+
+    # --------------------------------------------------------
+    # RESULTS
+    # --------------------------------------------------------
+
+    st.divider()
+    st.subheader("💳 Credit Card Eligibility Result")
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.metric(
+            "Existing EMI Ratio",
+            f"{existing_foir:.2f}%"
+        )
+
+    with col2:
+        st.metric(
+            "Monthly Income",
+            f"₹{monthly_gross_income:,.0f}"
+        )
+
+    with col3:
+        st.metric(
+            "Income After EMIs",
+            f"₹{remaining_income:,.0f}"
+        )
+
+    passed_checks = sum(checks.values())
+    total_checks = len(checks)
+
+    if monthly_gross_income <= 0:
+
+        st.error(
+            "Unable to assess eligibility. Please enter a valid income."
+        )
+
+    elif passed_checks == total_checks:
+
+        st.markdown("""
+        <div class="safe">
+            <h3>🟢 Preliminary Screening: Meets Selected Criteria</h3>
+            <p>The applicant meets all the screening conditions entered.
+            This does not guarantee credit card approval.</p>
+        </div>
+        """, unsafe_allow_html=True)
+
+    else:
+
+        st.markdown("""
+        <div class="risk">
+            <h3>🔴 Preliminary Screening: Further Review Required</h3>
+            <p>One or more selected screening conditions have not been met.
+            The applicant may need further review.</p>
+        </div>
+        """, unsafe_allow_html=True)
+
+    # INDIVIDUAL CHECKS
+
+    st.subheader("📋 Eligibility Checklist")
+
+    for description, passed in checks.items():
+
+        if passed:
+            st.success(f"✅ {description}")
+        else:
+            st.error(f"❌ {description}")
 
     st.write(
-        f"**Monthly Gross Income:** "
-        f"₹{monthly_gross_income:,.2f}"
+        f"**Screening conditions met:** "
+        f"{passed_checks} out of {total_checks}"
     )
 
-    st.write(
-        f"**Existing EMI:** "
-        f"₹{existing_emi_total:,.2f}"
-    )
+    # CREDIT CARD GUIDANCE
 
-    st.write(
-        f"**Proposed EMI:** "
-        f"₹{proposed_emi:,.2f}"
-    )
+    with st.expander("🔎 View Credit Card Assessment Details"):
 
-    st.write(
-        f"**Total Monthly Obligation:** "
-        f"₹{total_obligation:,.2f}"
-    )
+        st.write(f"**Applicant Age:** {age}")
 
-    st.write(
-        f"**FOIR:** "
-        f"({total_obligation:,.2f} ÷ "
-        f"{monthly_gross_income:,.2f}) × 100"
-    )
+        st.write(f"**Credit Score:** {credit_score}")
 
-    st.write(
-        f"**Calculated FOIR:** "
-        f"{foir:.2f}%"
-    )
+        st.write(f"**Employment Type:** {employment_type}")
+
+        st.write(f"**Monthly Gross Income:** ₹{monthly_gross_income:,.2f}")
+
+        st.write(f"**Existing Monthly EMIs:** ₹{existing_emi_total:,.2f}")
+
+        st.write(f"**Existing EMI-to-Income Ratio:** {existing_foir:.2f}%")
+
+        st.write(f"**Income Remaining After EMIs:** ₹{remaining_income:,.2f}")
+
+        st.write(f"**Repayment History:** {repayment_history}")
+
+        st.write(f"**Selected Minimum Income:** ₹{minimum_income:,.2f}")
+
+        st.write(f"**Selected Minimum Credit Score:** {minimum_credit_score}")
+
+        st.write(f"**Selected Maximum EMI Ratio:** {maximum_foir}%")
 
 # ============================================================
-# IMPORTANT DISCLAIMER
+# DISCLAIMER
 # ============================================================
 
 st.divider()
 
 st.warning(
-    "⚠️ This is a preliminary FOIR assessment tool. "
-    "FOIR thresholds vary between banks/NBFCs and loan products. "
-    "Actual approval depends on the lender's credit policy, "
-    "credit history, income verification, employment/business profile, "
-    "existing liabilities and other underwriting criteria."
+    "⚠️ IMPORTANT DISCLAIMER: This application is a preliminary "
+    "financial screening tool for educational and indicative purposes. "
+    "FOIR, minimum income, age and credit score requirements vary "
+    "between banks, NBFCs, card issuers and financial products. "
+    "Actual credit card or loan approval depends on the issuer's "
+    "underwriting policy, verified income, credit bureau report, "
+    "repayment history, existing liabilities and other factors. "
+    "This application does not guarantee approval or a credit limit."
 )
 
 st.caption(
-    "FOIR = Total Monthly Debt Obligations ÷ Monthly Gross Income × 100"
+    "Loan FOIR = Total Monthly Debt Obligations ÷ Monthly Gross Income × 100"
+)
+
+st.caption(
+    "Credit Card Screening = Indicative assessment using selected "
+    "income, credit score, age, repayment history and EMI criteria."
 )

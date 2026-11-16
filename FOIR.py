@@ -1,4 +1,3 @@
-
 import streamlit as st
 
 # ============================================================
@@ -79,57 +78,58 @@ st.divider()
 # ============================================================
 
 calculator_type = st.selectbox(
-    "Select Eligibility Calculator",
+    "Select an Option",
     [
         "Loan FOIR Calculator",
-        "Credit Card Eligibility"
+        "Credit Card Eligibility",
+        "Product Links"
     ]
 )
 
 st.divider()
 
 # ============================================================
-# 1. CUSTOMER INCOME
+# SHARED INPUTS (ONLY FOR CALCULATORS, HIDDEN FOR PRODUCT LINKS)
 # ============================================================
 
-st.subheader("1️⃣ Customer Income")
+if calculator_type != "Product Links":
 
-monthly_gross_income = st.number_input(
-    "Monthly Gross Income (₹)",
-    min_value=0.0,
-    value=50000.0,
-    step=1000.0,
-    format="%.0f"
-)
+    # 1. CUSTOMER INCOME
+    st.subheader("1️⃣ Customer Income")
 
-# ============================================================
-# 2. EXISTING EMIs
-# ============================================================
-
-st.subheader("2️⃣ Existing Monthly Obligations")
-
-num_emis = st.number_input(
-    "Number of Existing EMIs",
-    min_value=0,
-    max_value=20,
-    value=2,
-    step=1
-)
-
-existing_emi_total = 0.0
-
-for i in range(int(num_emis)):
-
-    emi = st.number_input(
-        f"Existing EMI {i + 1} (₹)",
+    monthly_gross_income = st.number_input(
+        "Monthly Gross Income (₹)",
         min_value=0.0,
-        value=5000.0,
-        step=500.0,
-        format="%.0f",
-        key=f"existing_emi_{i}"
+        value=50000.0,
+        step=1000.0,
+        format="%.0f"
     )
 
-    existing_emi_total += emi
+    # 2. EXISTING EMIs
+    st.subheader("2️⃣ Existing Monthly Obligations")
+
+    num_emis = st.number_input(
+        "Number of Existing EMIs",
+        min_value=0,
+        max_value=20,
+        value=2,
+        step=1
+    )
+
+    existing_emi_total = 0.0
+
+    for i in range(int(num_emis)):
+
+        emi = st.number_input(
+            f"Existing EMI {i + 1} (₹)",
+            min_value=0.0,
+            value=5000.0,
+            step=500.0,
+            format="%.0f",
+            key=f"existing_emi_{i}"
+        )
+
+        existing_emi_total += emi
 
 # ============================================================
 # 3. LOAN FOIR CALCULATOR
@@ -535,6 +535,100 @@ elif calculator_type == "Credit Card Eligibility":
         st.write(f"**Selected Minimum Credit Score:** {minimum_credit_score}")
 
         st.write(f"**Selected Maximum EMI Ratio:** {maximum_foir}%")
+
+# ============================================================
+# 5. PRODUCT LINKS
+# ============================================================
+
+elif calculator_type == "Product Links":
+
+    st.subheader("🔗 Financial Product Links")
+
+    product_category = st.selectbox(
+        "Select Product Category",
+        [
+            "Credit Cards"
+        ]
+    )
+
+    st.divider()
+
+    # ========================================================
+    # CREDIT CARDS
+    # ========================================================
+
+    if product_category == "Credit Cards":
+
+        st.subheader("💳 Credit Card Products")
+
+        st.caption(
+            "Select a card below to view the available application/product link."
+        )
+
+        products = [
+            {
+                "name": "BOB Eterna Credit Card",
+                "url": "https://bitli.in/dopaulw"
+            },
+            {
+                "name": "IDFC Credit Card",
+                "url": "https://bitli.in/p6aOmkW"
+            },
+            {
+                "name": "Axis Neo RuPay Credit Card",
+                "url": "https://bitli.in/pJwn1Ph"
+            },
+            {
+                "name": "Scapia Co-branded Credit Card",
+                "url": "https://bitli.in/5448inS"
+            },
+            {
+                "name": "Uni GoldX Credit Card",
+                "url": "https://bitli.in/gT5li6y"
+            },
+            {
+                "name": "HDFC Pixel Play Credit Card",
+                "url": "https://bitli.in/gj6asSH"
+            },
+            {
+                "name": "Kotak League Platinum Credit Card",
+                "url": "https://bitli.in/jqrDj8E"
+            },
+            {
+                "name": "Axis Flipkart Credit Card",
+                "url": "https://bitli.in/5gbo0dk"
+            },
+            {
+                "name": "IndusInd Tiger Credit Card",
+                "url": "https://bitli.in/9uPfKe3"
+            },
+            {
+                "name": "SBI Cashback Credit Card",
+                "url": "https://bitli.in/kfeV1sZ"
+            },
+            {
+                "name": "SBI Flipkart Credit Card",
+                "url": "https://bitli.in/WLK8XQP"
+            },
+            {
+                "name": "RBL Bank Shoprite Credit Card",
+                "url": "https://bitli.in/gho4vkd"
+            }
+        ]
+
+        for product in products:
+
+            with st.container(border=True):
+
+                st.markdown(
+                    f"### {product['name']}"
+                )
+
+                st.link_button(
+                    "🔗 Apply / View Card",
+                    product["url"],
+                    use_container_width=True
+                )
 
 # ============================================================
 # DISCLAIMER

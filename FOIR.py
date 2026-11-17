@@ -5,7 +5,7 @@ import streamlit as st
 # ============================================================
 
 st.set_page_config(
-    page_title="Loan & Credit Card Eligibility",
+    page_title="Loan & Credit Card Eligibility & Products",
     page_icon="💰",
     layout="centered"
 )

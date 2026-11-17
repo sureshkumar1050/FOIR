@@ -66,7 +66,7 @@ st.markdown(
 
 st.markdown(
     '<div class="subtitle">'
-    'Loan FOIR Calculation & Credit Card Eligibility Screening'
+    'Loan FOIR Calculation & Credit Card Eligibility Screening & Products'
     '</div>',
     unsafe_allow_html=True
 )

@@ -60,7 +60,7 @@ st.markdown("""
 # ============================================================
 
 st.markdown(
-    '<div class="title">💰 Financial Eligibility Calculator</div>',
+    '<div class="title">💰 Financial Eligibility Calculator & Products</div>',
     unsafe_allow_html=True
 )
 

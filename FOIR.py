@@ -239,6 +239,11 @@ if calculator_type == "Loan FOIR Calculator":
     | Above 50% | 🔴 High Risk | Higher debt burden |
     """)
 
+    st.info(
+        "💡 **Tip:** Alongside a healthy FOIR, most Indian banks require a **750+ CIBIL score** for instant loan approval. "
+        "[Check your Free CIBIL Score here ↗](https://www.cibil.com/freecibilscore)"
+    )
+
     # ADDITIONAL EMI CAPACITY
 
     st.subheader("💡 Additional EMI Capacity")
@@ -328,6 +333,9 @@ elif calculator_type == "Credit Card Eligibility":
             max_value=900,
             value=750,
             step=1
+        )
+        st.caption(
+            "Don't know your score? [Check Free CIBIL Score ↗](https://www.cibil.com/freecibilscore)"
         )
 
     employment_type = st.selectbox(
@@ -504,6 +512,11 @@ elif calculator_type == "Credit Card Eligibility":
             st.success(f"✅ {description}")
         else:
             st.error(f"❌ {description}")
+            if "Credit score" in description:
+                st.link_button(
+                    "📊 Verify Your Free CIBIL Score",
+                    "https://www.cibil.com/freecibilscore"
+                )
 
     st.write(
         f"**Screening conditions met:** "
